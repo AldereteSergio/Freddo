@@ -163,12 +163,13 @@ class Researcher {
 
       const actionResults = await ActionRegistry.executeAll(finalToolCalls, {
         llm: input.config.llm,
-        embedding: input.config.embedding,
-        session: session,
-        researchBlockId: researchBlockId,
-        fileIds: input.config.fileIds,
-        mode: input.config.mode,
-      });
+      embedding: input.config.embedding,
+      session: session,
+      researchBlockId: researchBlockId,
+      fileIds: input.config.fileIds,
+      mode: input.config.mode,
+      useReranker: input.config.useReranker,
+    });
 
       actionOutput.push(...actionResults);
 

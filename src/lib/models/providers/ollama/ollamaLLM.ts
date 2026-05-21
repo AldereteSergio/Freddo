@@ -93,8 +93,13 @@ class OllamaLLM extends BaseLLM<OllamaConfig> {
         top_p: input.options?.topP ?? this.config.options?.topP,
         temperature:
           input.options?.temperature ?? this.config.options?.temperature ?? 0.7,
+        num_ctx: process.env.OLLAMA_NUM_CTX
+          ? parseInt(process.env.OLLAMA_NUM_CTX)
+          : 32000,
         num_predict: input.options?.maxTokens ?? this.config.options?.maxTokens,
-        num_ctx: 32000,
+        num_ctx: process.env.OLLAMA_NUM_CTX
+          ? parseInt(process.env.OLLAMA_NUM_CTX)
+          : 32000,
         frequency_penalty:
           input.options?.frequencyPenalty ??
           this.config.options?.frequencyPenalty,
@@ -148,7 +153,9 @@ class OllamaLLM extends BaseLLM<OllamaConfig> {
         top_p: input.options?.topP ?? this.config.options?.topP,
         temperature:
           input.options?.temperature ?? this.config.options?.temperature ?? 0.7,
-        num_ctx: 32000,
+        num_ctx: process.env.OLLAMA_NUM_CTX
+          ? parseInt(process.env.OLLAMA_NUM_CTX)
+          : 32000,
         num_predict: input.options?.maxTokens ?? this.config.options?.maxTokens,
         frequency_penalty:
           input.options?.frequencyPenalty ??
@@ -195,6 +202,9 @@ class OllamaLLM extends BaseLLM<OllamaConfig> {
         top_p: input.options?.topP ?? this.config.options?.topP,
         temperature:
           input.options?.temperature ?? this.config.options?.temperature ?? 0.7,
+        num_ctx: process.env.OLLAMA_NUM_CTX
+          ? parseInt(process.env.OLLAMA_NUM_CTX)
+          : 32000,
         num_predict: input.options?.maxTokens ?? this.config.options?.maxTokens,
         frequency_penalty:
           input.options?.frequencyPenalty ??
@@ -235,6 +245,9 @@ class OllamaLLM extends BaseLLM<OllamaConfig> {
         top_p: input.options?.topP ?? this.config.options?.topP,
         temperature:
           input.options?.temperature ?? this.config.options?.temperature ?? 0.7,
+        num_ctx: process.env.OLLAMA_NUM_CTX
+          ? parseInt(process.env.OLLAMA_NUM_CTX)
+          : 32000,
         num_predict: input.options?.maxTokens ?? this.config.options?.maxTokens,
         frequency_penalty:
           input.options?.frequencyPenalty ??

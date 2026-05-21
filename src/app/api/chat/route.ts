@@ -9,6 +9,7 @@ import db from '@/lib/db';
 import { eq } from 'drizzle-orm';
 import { chats } from '@/lib/db/schema';
 import UploadManager from '@/lib/uploads/manager';
+import { getUseReranker } from '@/lib/config/serverRegistry';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -222,6 +223,7 @@ export const POST = async (req: Request) => {
         mode: body.optimizationMode,
         fileIds: body.files,
         systemInstructions: body.systemInstructions || 'None',
+        useReranker: getUseReranker(),
       },
     });
 

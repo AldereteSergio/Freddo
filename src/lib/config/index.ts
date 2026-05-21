@@ -113,6 +113,17 @@ class ConfigManager {
         scope: 'server',
         env: 'SEARXNG_API_URL',
       },
+      {
+        name: 'Use Reranker',
+        key: 'useReranker',
+        type: 'switch',
+        required: false,
+        description:
+          'Enable a local reranker for better result relevance (requires more resources).',
+        default: false,
+        scope: 'server',
+        env: 'ENABLE_LOCAL_RERANKER',
+      },
     ],
   };
 

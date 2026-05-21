@@ -17,7 +17,9 @@ const Search = ({
           value={
             (field.scope === 'client'
               ? localStorage.getItem(field.key)
-              : values[field.key]) ?? field.default
+              : field.env
+                ? process.env[field.env] || values[field.key]
+                : values[field.key]) ?? field.default
           }
           dataAdd="search"
         />

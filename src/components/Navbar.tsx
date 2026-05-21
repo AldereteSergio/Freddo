@@ -13,6 +13,8 @@ import jsPDF from 'jspdf';
 import { useChat, Section } from '@/lib/hooks/useChat';
 import { SourceBlock } from '@/lib/types';
 
+import { sanitizeCoreOutput } from '@/lib/utils/sanitizer';
+
 const downloadFile = (filename: string, content: string, type: string) => {
   const blob = new Blob([content], { type });
   const url = URL.createObjectURL(blob);
@@ -46,11 +48,12 @@ const exportAsMarkdown = (sections: Section[], title: string) => {
       md += `**🤖 Assistant**  
 `;
       md += `*${new Date(section.message.createdAt).toLocaleString()}*\n\n`;
-      md += `> ${section.message.responseBlocks
-        .filter((b) => b.type === 'text')
-        .map((block) => block.data)
-        .join('\n')
-        .replace(/\n/g, '\n> ')}\n`;
+      md += `> ${sanitizeCoreOutput(
+        section.message.responseBlocks
+          .filter((b) => b.type === 'text')
+          .map((block) => block.data)
+          .join('\n'),
+      ).replace(/\n/g, '\n> ')}\n`;
     }
 
     const sourceResponseBlock = section.message.responseBlocks.find(
@@ -143,7 +146,7 @@ const exportAsPDF = (sections: Section[], title: string) => {
       doc.setTextColor(30);
       doc.setFontSize(12);
       const assistantLines = doc.splitTextToSize(
-        section.parsedTextBlocks.join('\n'),
+        sanitizeCoreOutput(section.parsedTextBlocks.join('\n')),
         180,
       );
       for (let i = 0; i < assistantLines.length; i++) {

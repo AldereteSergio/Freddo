@@ -17,6 +17,7 @@ export const executeSearch = async (input: {
   session: InstanceType<typeof SessionManager>;
   llm: BaseLLM<any>;
   embedding: BaseEmbedding<any>;
+  useReranker?: boolean;
 }) => {
   const researchBlock = input.researchBlock;
 
@@ -47,33 +48,9 @@ export const executeSearch = async (input: {
 
       let resultChunks: Chunk[] = [];
 
-      try {
-        const queryEmbedding = (await input.embedding.embedText([q]))[0];
-
-        resultChunks = (
-          await Promise.all(
-            res.results.map(async (r) => {
-              const content = r.content || r.title;
-              const chunkEmbedding = (
-                await input.embedding.embedText([content])
-              )[0];
-
-              return {
-                content,
-                metadata: {
-                  title: r.title,
-                  url: r.url,
-                  similarity: computeSimilarity(queryEmbedding, chunkEmbedding),
-                  embedding: chunkEmbedding,
-                },
-              };
-            }),
-          )
-        ).filter((c) => c.metadata.similarity > 0.5);
-      } catch (err) {
+      if (input.mode === 'speed') {
         resultChunks = res.results.map((r) => {
           const content = r.content || r.title;
-
           return {
             content,
             metadata: {
@@ -84,9 +61,64 @@ export const executeSearch = async (input: {
             },
           };
         });
-      } finally {
-        results.push(...resultChunks);
+      } else {
+        try {
+          const queryEmbedding = (await input.embedding.embedText([q]))[0];
+          const threshold = input.mode === 'balanced' ? 0.45 : 0.55;
+
+          resultChunks = (
+            await Promise.all(
+              res.results.map(async (r) => {
+                const content = r.content || r.title;
+                const chunkEmbedding = (
+                  await input.embedding.embedText([content])
+                )[0];
+
+                return {
+                  content,
+                  metadata: {
+                    title: r.title,
+                    url: r.url,
+                    similarity: computeSimilarity(queryEmbedding, chunkEmbedding),
+                    embedding: chunkEmbedding,
+                  },
+                };
+              }),
+            )
+          ).filter((c) => c.metadata.similarity > threshold);
+
+          if (resultChunks.length === 0 && res.results.length > 0) {
+            resultChunks = res.results.slice(0, 3).map((r) => {
+              const content = r.content || r.title;
+              return {
+                content,
+                metadata: {
+                  title: r.title,
+                  url: r.url,
+                  similarity: 1,
+                  embedding: [],
+                },
+              };
+            });
+          }
+        } catch (err) {
+          resultChunks = res.results.map((r) => {
+            const content = r.content || r.title;
+
+            return {
+              content,
+              metadata: {
+                title: r.title,
+                url: r.url,
+                similarity: 1,
+                embedding: [],
+              },
+            };
+          });
+        }
       }
+
+      results.push(...resultChunks);
 
       if (!searchResultsEmitted) {
         searchResultsEmitted = true;
@@ -127,23 +159,32 @@ export const executeSearch = async (input: {
 
     await Promise.all(input.queries.map(search));
 
-    results.sort((a, b) => b.metadata.similarity - a.metadata.similarity);
+    // Deduplicate by URL
+    const uniqueByUrl = new Map<string, Chunk>();
+    results.forEach((r) => {
+      if (!uniqueByUrl.has(r.metadata.url)) {
+        uniqueByUrl.set(r.metadata.url, r);
+      }
+    });
+    const deduplicatedResults = Array.from(uniqueByUrl.values());
+
+    deduplicatedResults.sort((a, b) => b.metadata.similarity - a.metadata.similarity);
 
     const uniqueSearchResultIndices: Set<number> = new Set();
 
-    for (let i = 0; i < results.length; i++) {
+    for (let i = 0; i < deduplicatedResults.length; i++) {
       let isDuplicate = false;
 
       for (const indice of uniqueSearchResultIndices.keys()) {
         if (
-          results[i].metadata.embedding.length === 0 ||
-          results[indice].metadata.embedding.length === 0
+          deduplicatedResults[i].metadata.embedding.length === 0 ||
+          deduplicatedResults[indice].metadata.embedding.length === 0
         )
           continue;
 
         const similarity = computeSimilarity(
-          results[i].metadata.embedding,
-          results[indice].metadata.embedding,
+          deduplicatedResults[i].metadata.embedding,
+          deduplicatedResults[indice].metadata.embedding,
         );
 
         if (similarity > 0.75) {
@@ -159,7 +200,7 @@ export const executeSearch = async (input: {
 
     const uniqueSearchResults = Array.from(uniqueSearchResultIndices.keys())
       .map((i) => {
-        const uniqueResult = results[i];
+        const uniqueResult = deduplicatedResults[i];
 
         delete uniqueResult.metadata.embedding;
         delete uniqueResult.metadata.similarity;
@@ -237,6 +278,15 @@ export const executeSearch = async (input: {
 
     await Promise.all(input.queries.map(search));
 
+    // Deduplicate by URL
+    const uniqueByUrl = new Map<string, Chunk>();
+    searchResults.forEach((r) => {
+      if (!uniqueByUrl.has(r.metadata.url)) {
+        uniqueByUrl.set(r.metadata.url, r);
+      }
+    });
+    const deduplicatedSearchResults = Array.from(uniqueByUrl.values());
+
     const pickerPrompt = `
       Assistant is an AI search result picker. Assistant's task is to pick 2-3 of the most relevant search results based off the query which can be then scraped for information to answer the query.
       Assistant will be shared with the search results retrieved from a search engine along with the queries used to retrieve those results. Assistant will then pick maxiumum 3 of the most relevant search results based on the queries and the content of the search results. Assistant should only pick search results that are relevant to the query and can help in answering the question.
@@ -269,23 +319,48 @@ export const executeSearch = async (input: {
         ),
     });
 
-    const pickerResponse = await input.llm.generateObject<typeof pickerSchema>({
-      schema: pickerSchema,
-      messages: [
-        {
-          role: 'system',
-          content: pickerPrompt,
-        },
-        {
-          role: 'user',
-          content: `<queries>${input.queries.join(', ')}</queries>\n<search_results>${searchResults.map((result, index) => `<result indice=${index}>${JSON.stringify(result)}</result>`).join('\n')}</search_results>`,
-        },
-      ],
-    });
+    const batchSize = 10;
+    const pickedIndices: number[] = [];
 
-    const pickedIndices = pickerResponse.picked_indices.slice(0, 3);
-    const pickedResults = pickedIndices
-      .map((i) => searchResults[i])
+    if (input.mode === 'quality') {
+      // Process in batches of 10 to avoid context overflow and allow more sources
+      for (let i = 0; i < deduplicatedSearchResults.length; i += batchSize) {
+        const batch = deduplicatedSearchResults.slice(i, i + batchSize);
+        const batchResponse = await input.llm.generateObject<typeof pickerSchema>({
+          schema: pickerSchema,
+          messages: [
+            {
+              role: 'system',
+              content: pickerPrompt,
+            },
+            {
+              role: 'user',
+              content: `<queries>${input.queries.join(', ')}</queries>\n<search_results>${batch.map((result, index) => `<result indice=${i + index}>${JSON.stringify(result)}</result>`).join('\n')}</search_results>`,
+            },
+          ],
+        });
+        pickedIndices.push(...batchResponse.picked_indices);
+      }
+    } else {
+      const pickerResponse = await input.llm.generateObject<typeof pickerSchema>({
+        schema: pickerSchema,
+        messages: [
+          {
+            role: 'system',
+            content: pickerPrompt,
+          },
+          {
+            role: 'user',
+            content: `<queries>${input.queries.join(', ')}</queries>\n<search_results>${deduplicatedSearchResults.slice(0, 20).map((result, index) => `<result indice=${index}>${JSON.stringify(result)}</result>`).join('\n')}</search_results>`,
+          },
+        ],
+      });
+      pickedIndices.push(...pickerResponse.picked_indices);
+    }
+
+    const finalPickedIndices = Array.from(new Set(pickedIndices)).slice(0, 10); // Limit to top 10 total for scraping
+    const pickedResults = finalPickedIndices
+      .map((i) => deduplicatedSearchResults[i])
       .filter((r) => r !== undefined);
 
     const alreadyExtractedURLs: string[] = [];

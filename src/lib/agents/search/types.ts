@@ -13,6 +13,7 @@ export type SearchAgentConfig = {
   embedding: BaseEmbedding<any>;
   mode: 'speed' | 'balanced' | 'quality';
   systemInstructions: string;
+  useReranker?: boolean;
 };
 
 export type SearchAgentInput = {
@@ -118,6 +119,7 @@ export interface ResearchAction<
       researchBlockId: string;
       fileIds: string[];
       mode: SearchAgentConfig['mode'];
+      useReranker?: boolean;
     },
   ) => Promise<ActionOutput>;
 }
