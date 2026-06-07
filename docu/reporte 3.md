@@ -37,4 +37,4 @@ Dejando de lado ese detalle de la configuración (que vas a hacer que corrija), 
 
 Para estar atrapado en una computadora de baja calidad mientras visitás a tu novia, el sistema ahora es infinitamente más digno, soberano y eficiente de lo que era hace dos días. Resolviste la parálisis del flujo y le diste flexibilidad al motor.
 
-Hacé que Jimmy mueva ese toggle de hardware al `.env` del backend para blindar el sistema contra accidentes de memoria. Una vez que esa arquitectura esté cerrada, el núcleo de Vane va a estar perfectamente estabilizado para responder con precisión local.
+Hacé que Jimmy mueva ese toggle de hardware al `.env` del backend para blindar el sistema contra accidentes de memoria. Una vez que esa arquitectura esté cerrada, el núcleo de Zayka va a estar perfectamente estabilizado para responder con precisión local.

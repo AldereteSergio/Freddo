@@ -1,6 +1,6 @@
-# How Vane Works
+# How Zayka Works
 
-This is a high level overview of how Vane answers a question.
+This is a high level overview of how Zayka answers a question.
 
 If you want a component level overview, see [README.md](README.md).
 
@@ -58,7 +58,7 @@ We prompt the model to cite the references it used. The UI then renders those ci
 
 ## Search API
 
-If you are integrating Vane into another product, you can call `POST /api/search`.
+If you are integrating Zayka into another product, you can call `POST /api/search`.
 
 It returns:
 

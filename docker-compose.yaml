@@ -1,14 +1,14 @@
 services:
-  vane:
+  zayka:
     image: itzcrazykns1337/vane:latest
     build:
       context: .
     ports:
       - '3000:3000'
     volumes:
-      - data:/home/vane/data
+      - data:/home/zayka/data
     restart: unless-stopped
 
 volumes:
   data:
-    name: 'vane-data'
+    name: 'zayka-data'

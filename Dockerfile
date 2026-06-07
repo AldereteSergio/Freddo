@@ -2,7 +2,7 @@ FROM node:24.5.0-slim AS builder
 
 RUN apt-get update && apt-get install -y python3 python3-pip sqlite3 && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/vane
+WORKDIR /home/zayka
 
 COPY package.json yarn.lock ./
 RUN yarn install --frozen-lockfile --network-timeout 600000
@@ -12,7 +12,7 @@ COPY src ./src
 COPY public ./public
 COPY drizzle ./drizzle
 
-RUN mkdir -p /home/vane/data
+RUN mkdir -p /home/zayka/data
 RUN yarn build
 
 FROM node:24.5.0-slim
@@ -24,15 +24,15 @@ RUN apt-get update && apt-get install -y \
     curl sudo \
     && rm -rf /var/lib/apt/lists/*
 
-WORKDIR /home/vane
+WORKDIR /home/zayka
 
-COPY --from=builder /home/vane/public ./public
-COPY --from=builder /home/vane/.next/static ./public/_next/static
-COPY --from=builder /home/vane/.next/standalone ./
-COPY --from=builder /home/vane/data ./data
+COPY --from=builder /home/zayka/public ./public
+COPY --from=builder /home/zayka/.next/static ./public/_next/static
+COPY --from=builder /home/zayka/.next/standalone ./
+COPY --from=builder /home/zayka/data ./data
 COPY drizzle ./drizzle
 
-RUN mkdir /home/vane/uploads
+RUN mkdir /home/zayka/uploads
 
 RUN yarn add playwright
 RUN yarn playwright install --with-deps --only-shell chromium
@@ -63,7 +63,7 @@ RUN cd "/usr/local/searxng/searxng-src" && \
 
 USER root
 
-WORKDIR /home/vane
+WORKDIR /home/zayka
 COPY entrypoint.sh ./entrypoint.sh
 RUN chmod +x ./entrypoint.sh
 RUN sed -i 's/\r$//' ./entrypoint.sh || true
@@ -74,4 +74,4 @@ EXPOSE 3000 8080
 
 ENV SEARXNG_API_URL=http://localhost:8080
 
-CMD ["/home/vane/entrypoint.sh"]
+CMD ["/home/zayka/entrypoint.sh"]
