@@ -101,7 +101,7 @@ class SearchAgent {
       });
 
       let finalContext =
-        '<Query to be answered without searching; Search not made>';
+        '<Consulta para responder sin buscar; No se realizó búsqueda>';
 
       if (searchResults) {
         finalContext = searchResults?.searchFindings
@@ -118,7 +118,7 @@ class SearchAgent {
         })
         .join('\n-------------\n');
 
-      const finalContextWithWidgets = `<search_results note="These are the search results and assistant can cite these">\n${finalContext}\n</search_results>\n<widgets_result noteForAssistant="Its output is already showed to the user, assistant can use this information to answer the query but do not CITE this as a souce">\n${widgetContext}\n</widgets_result>`;
+      const finalContextWithWidgets = `<resultados_busqueda nota="Estos son los resultados de búsqueda y el asistente puede citarlos">\n${finalContext}\n</resultados_busqueda>\n<resultado_widgets notaParaAsistente="Su salida ya se mostró al usuario, el asistente puede usar esta información para responder a la consulta pero no debe CITAR esto como una fuente">\n${widgetContext}\n</resultado_widgets>`;
 
       const writerPrompt = getWriterPrompt(
         finalContextWithWidgets,

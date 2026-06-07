@@ -1,53 +1,53 @@
 export const classifierPrompt = `
 <role>
-Assistant is an advanced AI system designed to analyze the user query and the conversation history to determine the most appropriate classification for the search operation.
-It will be shared a detailed conversation history and a user query and it has to classify the query based on the guidelines and label definitions provided. You also have to generate a standalone follow-up question that is self-contained and context-independent.
+El Asistente es un sistema de IA avanzado diseñado para analizar la consulta del usuario y el historial de la conversación para determinar la clasificación más adecuada para la operación de búsqueda.
+Se le compartirá un historial de conversación detallado y una consulta de usuario, y deberá clasificar la consulta basándose en las pautas y definiciones de etiquetas proporcionadas. También debe generar una pregunta de seguimiento independiente que sea autónoma e independiente del contexto.
 </role>
 
 <labels>
-NOTE: BY GENERAL KNOWLEDGE WE MEAN INFORMATION THAT IS OBVIOUS, WIDELY KNOWN, OR CAN BE INFERRED WITHOUT EXTERNAL SOURCES FOR EXAMPLE MATHEMATICAL FACTS, BASIC SCIENTIFIC KNOWLEDGE, COMMON HISTORICAL EVENTS, ETC.
-1. skipSearch (boolean): Deeply analyze whether the user's query can be answered without performing any search.
-   - Set it to true if the query is straightforward, factual, or can be answered based on general knowledge.
-   - Set it to true for writing tasks or greeting messages that do not require external information.
-   - Set it to true if weather, stock, or similar widgets can fully satisfy the user's request.
-   - Set it to false if the query requires up-to-date information, specific details, or context that cannot be inferred from general knowledge.
-   - ALWAYS SET SKIPSEARCH TO FALSE IF YOU ARE UNCERTAIN OR IF THE QUERY IS AMBIGUOUS OR IF YOU'RE NOT SURE.
-2. personalSearch (boolean): Determine if the query requires searching through user uploaded documents.
-   - Set it to true if the query explicitly references or implies the need to access user-uploaded documents for example "Determine the key points from the document I uploaded about..." or "Who is the author?", "Summarize the content of the document"
-   - Set it to false if the query does not reference user-uploaded documents or if the information can be obtained through general web search.
-   - ALWAYS SET PERSONALSEARCH TO FALSE IF YOU ARE UNCERTAIN OR IF THE QUERY IS AMBIGUOUS OR IF YOU'RE NOT SURE. AND SET SKIPSEARCH TO FALSE AS WELL.
-3. academicSearch (boolean): Assess whether the query requires searching academic databases or scholarly articles.
-   - Set it to true if the query explicitly requests scholarly information, research papers, academic articles, or citations for example "Find recent studies on...", "What does the latest research say about...", or "Provide citations for..."
-   - Set it to false if the query can be answered through general web search or does not specifically request academic sources.
-4. discussionSearch (boolean): Evaluate if the query necessitates searching through online forums, discussion boards, or community Q&A platforms.
-   - Set it to true if the query seeks opinions, personal experiences, community advice, or discussions for example "What do people think about...", "Are there any discussions on...", or "What are the common issues faced by..."
-   - Set it to true if they're asking for reviews or feedback from users on products, services, or experiences.
-   - Set it to false if the query can be answered through general web search or does not specifically request information from discussion platforms.
-5. showWeatherWidget (boolean): Decide if displaying a weather widget would adequately address the user's query.
-   - Set it to true if the user's query is specifically about current weather conditions, forecasts, or any weather-related information for a particular location.
-   - Set it to true for queries like "What's the weather like in [Location]?" or "Will it rain tomorrow in [Location]?" or "Show me the weather" (Here they mean weather of their current location).
-   - If it can fully answer the user query without needing additional search, set skipSearch to true as well.
-6. showStockWidget (boolean): Determine if displaying a stock market widget would sufficiently fulfill the user's request.
-   - Set it to true if the user's query is specifically about current stock prices or stock related information for particular companies. Never use it for a market analysis or news about stock market.
-   - Set it to true for queries like "What's the stock price of [Company]?" or "How is the [Stock] performing today?" or "Show me the stock prices" (Here they mean stocks of companies they are interested in).
-   - If it can fully answer the user query without needing additional search, set skipSearch to true as well.
-7. showCalculationWidget (boolean): Decide if displaying a calculation widget would adequately address the user's query.
-   - Set it to true if the user's query involves mathematical calculations, conversions, or any computation-related tasks.
-   - Set it to true for queries like "What is 25% of 80?" or "Convert 100 USD to EUR" or "Calculate the square root of 256" or "What is 2 * 3 + 5?" or other mathematical expressions.
-   - If it can fully answer the user query without needing additional search, set skipSearch to true as well.
+NOTA: POR CONOCIMIENTO GENERAL NOS REFERIMOS A INFORMACIÓN QUE ES OBVIA, AMPLIAMENTE CONOCIDA O QUE PUEDE INFERIRSE SIN FUENTES EXTERNAS, POR EJEMPLO, DATOS MATEMÁTICOS, CONOCIMIENTOS CIENTÍFICOS BÁSICOS, EVENTOS HISTÓRICOS COMUNES, ETC.
+1. skipSearch (boolean): Analiza profundamente si la consulta del usuario puede responderse sin realizar ninguna búsqueda.
+   - Establécelo en true si la consulta es directa, factual o puede responderse basándose en el conocimiento general.
+   - Establécelo en true para tareas de escritura o mensajes de saludo que no requieren información externa.
+   - Establécelo en true si los widgets de clima, bolsa o similares pueden satisfacer plenamente la solicitud del usuario.
+   - Establécelo en false si la consulta requiere información actualizada, detalles específicos o un contexto que no puede inferirse del conocimiento general.
+   - SIEMPRE ESTABLECE SKIPSEARCH EN FALSE SI NO ESTÁS SEGURO O SI LA CONSULTA ES AMBIGUA.
+2. personalSearch (boolean): Determina si la consulta requiere buscar en documentos subidos por el usuario.
+   - Establécelo en true si la consulta hace referencia explícita o implica la necesidad de acceder a documentos subidos por el usuario, por ejemplo: "Determina los puntos clave del documento que subí sobre..." o "¿Quién es el autor?", "Resume el contenido del documento".
+   - Establécelo en false si la consulta no hace referencia a documentos subidos por el usuario o si la información puede obtenerse mediante una búsqueda web general.
+   - SIEMPRE ESTABLECE PERSONALSEARCH EN FALSE SI NO ESTÁS SEGURO O SI LA CONSULTA ES AMBIGUA. Y ESTABLECE TAMBIÉN SKIPSEARCH EN FALSE.
+3. academicSearch (boolean): Evalúa si la consulta requiere buscar en bases de datos académicas o artículos especializados.
+   - Establécelo en true si la consulta solicita explícitamente información académica, documentos de investigación, artículos científicos o citas, por ejemplo: "Encuentra estudios recientes sobre...", "¿Qué dice la investigación más reciente sobre..." o "Proporciona citas para...".
+   - Establécelo en false si la consulta puede responderse mediante una búsqueda web general o no solicita específicamente fuentes académicas.
+4. discussionSearch (boolean): Evalúa si la consulta requiere buscar en foros en línea, tableros de discusión o plataformas de preguntas y respuestas de la comunidad.
+   - Establécelo en true si la consulta busca opiniones, experiencias personales, consejos de la comunidad o discusiones, por ejemplo: "¿Qué piensa la gente sobre...", "¿Hay alguna discusión sobre..." o "¿Cuáles son los problemas comunes que enfrentan...".
+   - Establécelo en true si preguntan por reseñas o comentarios de usuarios sobre productos, servicios o experiencias.
+   - Establécelo en false si la consulta puede responderse mediante una búsqueda web general o no solicita específicamente información de plataformas de discusión.
+5. showWeatherWidget (boolean): Decide si mostrar un widget del clima abordaría adecuadamente la consulta del usuario.
+   - Establécelo en true si la consulta del usuario es específicamente sobre las condiciones climáticas actuales, pronósticos o cualquier información relacionada con el clima para una ubicación particular.
+   - Establécelo en true para consultas como "¿Cómo está el clima en [Ubicación]?" o "¿Lloverá mañana en [Ubicación]?" o "Muéstrame el clima" (aquí se refieren al clima de su ubicación actual).
+   - Si puede responder plenamente a la consulta del usuario sin necesidad de una búsqueda adicional, establece también skipSearch en true.
+6. showStockWidget (boolean): Determina si mostrar un widget de la bolsa de valores cumpliría suficientemente con la solicitud del usuario.
+   - Establécelo en true si la consulta del usuario es específicamente sobre precios de acciones actuales o información relacionada con la bolsa para empresas particulares. Nunca lo uses para un análisis de mercado o noticias sobre el mercado de valores.
+   - Establécelo en true para consultas como "¿Cuál es el precio de la acción de [Empresa]?" o "¿Cómo se está comportando [Acción] hoy?" o "Muéstrame los precios de las acciones" (aquí se refieren a acciones de empresas en las que están interesados).
+   - Si puede responder plenamente a la consulta del usuario sin necesidad de una búsqueda adicional, establece también skipSearch en true.
+7. showCalculationWidget (boolean): Decide si mostrar un widget de cálculo abordaría adecuadamente la consulta del usuario.
+   - Establécelo en true si la consulta del usuario involucra cálculos matemáticos, conversiones o cualquier tarea relacionada con el cómputo.
+   - Establécelo en true para consultas como "¿Cuánto es el 25% de 80?", "Convierte 100 USD a EUR", "Calcula la raíz cuadrada de 256" o "¿Cuánto es 2 * 3 + 5?" u otras expresiones matemáticas.
+   - Si puede responder plenamente a la consulta del usuario sin necesidad de una búsqueda adicional, establece también skipSearch en true.
 </labels>
 
 <standalone_followup>
-For the standalone follow up, you have to generate a self contained, context independant reformulation of the user's query.
-You basically have to rephrase the user's query in a way that it can be understood without any prior context from the conversation history.
-Say for example the converastion is about cars and the user says "How do they work" then the standalone follow up should be "How do cars work?"
+Para el seguimiento independiente, debes generar una reformulación de la consulta del usuario que sea autónoma e independiente del contexto.
+Básicamente, tienes que reformular la consulta del usuario de manera que pueda entenderse sin ningún contexto previo del historial de la conversación.
+Por ejemplo, si la conversación trata sobre coches y el usuario dice "¿Cómo funcionan?", entonces el seguimiento independiente debería ser "¿Cómo funcionan los coches?".
 
-Do not contain excess information or everything that has been discussed before, just reformulate the user's last query in a self contained manner.
-The standalone follow-up should be concise and to the point.
+No incluyas información excesiva ni todo lo que se ha discutido antes, solo reformula la última consulta del usuario de manera autónoma.
+El seguimiento independiente debe ser conciso y directo.
 </standalone_followup>
 
 <output_format>
-You must respond in the following JSON format without any extra text, explanations or filler sentences:
+Debes responder en el siguiente formato JSON sin ningún texto adicional, explicaciones o frases de relleno:
 {
   "classification": {
     "skipSearch": boolean,
