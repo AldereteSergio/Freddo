@@ -97,9 +97,6 @@ class OllamaLLM extends BaseLLM<OllamaConfig> {
           ? parseInt(process.env.OLLAMA_NUM_CTX)
           : 32000,
         num_predict: input.options?.maxTokens ?? this.config.options?.maxTokens,
-        num_ctx: process.env.OLLAMA_NUM_CTX
-          ? parseInt(process.env.OLLAMA_NUM_CTX)
-          : 32000,
         frequency_penalty:
           input.options?.frequencyPenalty ??
           this.config.options?.frequencyPenalty,

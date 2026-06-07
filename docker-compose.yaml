@@ -1,12 +1,30 @@
 services:
   zayka:
-    image: itzcrazykns1337/vane:latest
+    container_name: zayka
     build:
       context: .
+      dockerfile: Dockerfile
     ports:
       - '3000:3000'
     volumes:
       - data:/home/zayka/data
+    environment:
+      - SEARXNG_API_URL=http://host.docker.internal:5656
+      - CHROME_URL=ws://browser:3000
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    depends_on:
+      - browser
+    restart: unless-stopped
+
+  browser:
+    container_name: zayka-browser
+    image: browserless/chrome:latest
+    ports:
+      - '3001:3000'
+    environment:
+      - MAX_CONCURRENT_SESSIONS=10
+      - CONNECTION_TIMEOUT=60000
     restart: unless-stopped
 
 volumes:

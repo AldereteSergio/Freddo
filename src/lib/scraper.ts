@@ -14,17 +14,25 @@ class Scraper {
     await this.browserMutex.runExclusive(async () => {
       if (!this.browser) {
         const { chromium } = await import('playwright');
-        this.browser = await chromium.launch({
-          headless: true,
-          channel: 'chromium-headless-shell',
-          args: [
-            '--no-sandbox',
-            '--disable-setuid-sandbox',
-            '--disable-dev-shm-usage',
-            '--disable-gpu',
-            '--disable-blink-features=AutomationControlled',
-          ],
-        });
+        const chromeUrl = process.env.CHROME_URL;
+
+        if (chromeUrl) {
+          console.log(`Connecting to remote browser at ${chromeUrl}`);
+          this.browser = await chromium.connectOverCDP(chromeUrl);
+        } else {
+          console.log('Launching local browser');
+          this.browser = await chromium.launch({
+            headless: true,
+            channel: 'chromium-headless-shell',
+            args: [
+              '--no-sandbox',
+              '--disable-setuid-sandbox',
+              '--disable-dev-shm-usage',
+              '--disable-gpu',
+              '--disable-blink-features=AutomationControlled',
+            ],
+          });
+        }
       }
 
       if (this.idleTimeout) clearTimeout(this.idleTimeout);

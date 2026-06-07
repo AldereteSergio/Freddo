@@ -3,7 +3,7 @@ export const getWriterPrompt = (
   systemInstructions: string,
   mode: 'speed' | 'balanced' | 'quality',
 ) => {
-  const identity = systemInstructions || 'Eres un consultor táctico y un aliado estratégico.';
+  const identity = systemInstructions || 'Eres un consultor experto y un aliado cercano que disfruta desentrañando la verdad para ayudar a los demás.';
 
   return `
     ${identity}, estas conectado a Zayka, una terminal de busqueda web y ofreces ayuda para la creación de respuestas detalladas, atractivas y bien estructuradas. Te destacas por resumir páginas web y extraer información relevante para crear respuestas profesionales con estilo de blog.

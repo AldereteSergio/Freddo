@@ -1,6 +1,6 @@
 FROM node:24.5.0-slim AS builder
 
-RUN apt-get update && apt-get install -y python3 python3-pip sqlite3 && rm -rf /var/lib/apt/lists/*
+RUN apt-get update && apt-get install -y python3 python3-pip sqlite3 build-essential && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/zayka
 
@@ -15,63 +15,28 @@ COPY drizzle ./drizzle
 RUN mkdir -p /home/zayka/data
 RUN yarn build
 
-FROM node:24.5.0-slim
+FROM node:24.5.0-slim AS runner
 
 RUN apt-get update && apt-get install -y \
-    python3-dev python3-babel python3-venv python-is-python3 \
-    uwsgi uwsgi-plugin-python3 \
-    git build-essential libxslt-dev zlib1g-dev libffi-dev libssl-dev \
-    curl sudo \
+    sqlite3 \
+    curl \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /home/zayka
 
+# Copy standalone build and static files
 COPY --from=builder /home/zayka/public ./public
 COPY --from=builder /home/zayka/.next/static ./public/_next/static
 COPY --from=builder /home/zayka/.next/standalone ./
 COPY --from=builder /home/zayka/data ./data
 COPY drizzle ./drizzle
-
-RUN mkdir /home/zayka/uploads
-
-RUN yarn add playwright
-RUN yarn playwright install --with-deps --only-shell chromium
-
-RUN useradd --shell /bin/bash --system \
-    --home-dir "/usr/local/searxng" \
-    --comment 'Privacy-respecting metasearch engine' \
-    searxng
-
-RUN mkdir "/usr/local/searxng"
-RUN mkdir -p /etc/searxng
-RUN chown -R "searxng:searxng" "/usr/local/searxng"
-
-COPY searxng/settings.yml /etc/searxng/settings.yml
-COPY searxng/limiter.toml /etc/searxng/limiter.toml
-COPY searxng/uwsgi.ini /etc/searxng/uwsgi.ini
-RUN chown -R searxng:searxng /etc/searxng
-
-USER searxng
-
-RUN git clone "https://github.com/searxng/searxng" \
-                   "/usr/local/searxng/searxng-src"
-
-RUN python3 -m venv "/usr/local/searxng/searx-pyenv"
-RUN "/usr/local/searxng/searx-pyenv/bin/pip" install --upgrade pip setuptools wheel pyyaml msgspec typing_extensions
-RUN cd "/usr/local/searxng/searxng-src" && \
-    "/usr/local/searxng/searx-pyenv/bin/pip" install --use-pep517 --no-build-isolation -e .
-
-USER root
-
-WORKDIR /home/zayka
 COPY entrypoint.sh ./entrypoint.sh
-RUN chmod +x ./entrypoint.sh
-RUN sed -i 's/\r$//' ./entrypoint.sh || true
 
-RUN echo "searxng ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
+RUN mkdir /home/zayka/uploads && chmod +x ./entrypoint.sh && sed -i 's/\r$//' ./entrypoint.sh || true
 
-EXPOSE 3000 8080
+EXPOSE 3000
 
-ENV SEARXNG_API_URL=http://localhost:8080
+# Default environment for SearXNG (User has it on 5656)
+ENV SEARXNG_API_URL=http://host.docker.internal:5656
 
 CMD ["/home/zayka/entrypoint.sh"]
