@@ -6,6 +6,7 @@ const getSpeedPrompt = (
   i: number,
   maxIteration: number,
   fileDesc: string,
+  systemInstructions: string,
 ) => {
   const today = new Date().toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -13,8 +14,10 @@ const getSpeedPrompt = (
     day: 'numeric',
   });
 
+  const identity = systemInstructions || 'Eres un consultor táctico y un aliado estratégico.';
+
   return `
-  El Asistente es un orquestador de acciones. Tu trabajo es cumplir con las solicitudes del usuario seleccionando y ejecutando las herramientas disponibles; no des respuestas libres.
+  ${identity}, estas conectado a Zayka, una terminal de busqueda web y de recolección de información. Tu trabajo es cumplir con las solicitudes del usuario seleccionando y ejecutando las herramientas disponibles; no des respuestas libres.
   Se te compartirá el historial de conversación entre el usuario y una IA, junto con la última pregunta de seguimiento del usuario. Basándote en esto, debes usar las herramientas disponibles para cumplir con la solicitud del usuario.
 
   Fecha de hoy: ${today}
@@ -91,6 +94,7 @@ const getBalancedPrompt = (
   i: number,
   maxIteration: number,
   fileDesc: string,
+  systemInstructions: string,
 ) => {
   const today = new Date().toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -98,8 +102,10 @@ const getBalancedPrompt = (
     day: 'numeric',
   });
 
+  const identity = systemInstructions || 'Eres un estratega de investigación y un colaborador cercano.';
+
   return `
-  El Asistente es un orquestador de acciones. Tu trabajo es cumplir con las solicitudes del usuario razonando brevemente y ejecutando las herramientas disponibles; no des respuestas libres.
+  ${identity}, estas conectado a Zayka, una terminal de busqueda web y de recolección de información. Acá vas a orquestar acciones. Tu trabajo es cumplir con las solicitudes del usuario razonando brevemente y ejecutando las herramientas disponibles; no des respuestas libres.
   Se te compartirá el historial de conversación entre el usuario y una IA, junto con la última pregunta de seguimiento del usuario. Basándote en esto, debes usar las herramientas disponibles para cumplir con la solicitud del usuario.
 
   Fecha de hoy: ${today}
@@ -192,6 +198,7 @@ const getQualityPrompt = (
   i: number,
   maxIteration: number,
   fileDesc: string,
+  systemInstructions: string,
 ) => {
   const today = new Date().toLocaleDateString('es-ES', {
     year: 'numeric',
@@ -199,8 +206,10 @@ const getQualityPrompt = (
     day: 'numeric',
   });
 
+  const identity = systemInstructions || 'Eres un orquestador de investigación profunda y un analista de élite.';
+
   return `
-  El Asistente es un orquestador de investigación profunda. Tu trabajo es cumplir con las solicitudes del usuario con la investigación más exhaustiva y completa posible; no des respuestas libres.
+  ${identity}, estas conectado a Zayka, una terminal de busqueda web y de recolección de información.  Acá vas a orquestar investigaciones profundas. Tu trabajo es cumplir con las solicitudes del usuario con la investigación más exhaustiva y completa posible; no des respuestas libres.
   Se te compartirá el historial de conversación entre el usuario y una IA, junto con la última pregunta de seguimiento del usuario. Basándote en esto, debes usar las herramientas disponibles para cumplir con la solicitud del usuario con profundidad y rigor.
 
   Fecha de hoy: ${today}
@@ -323,6 +332,7 @@ export const getResearcherPrompt = (
   i: number,
   maxIteration: number,
   fileIds: string[],
+  systemInstructions: string,
 ) => {
   let prompt = '';
 
@@ -337,16 +347,16 @@ export const getResearcherPrompt = (
 
   switch (mode) {
     case 'speed':
-      prompt = getSpeedPrompt(actionDesc, i, maxIteration, fileDesc);
+      prompt = getSpeedPrompt(actionDesc, i, maxIteration, fileDesc, systemInstructions);
       break;
     case 'balanced':
-      prompt = getBalancedPrompt(actionDesc, i, maxIteration, fileDesc);
+      prompt = getBalancedPrompt(actionDesc, i, maxIteration, fileDesc, systemInstructions);
       break;
     case 'quality':
-      prompt = getQualityPrompt(actionDesc, i, maxIteration, fileDesc);
+      prompt = getQualityPrompt(actionDesc, i, maxIteration, fileDesc, systemInstructions);
       break;
     default:
-      prompt = getSpeedPrompt(actionDesc, i, maxIteration, fileDesc);
+      prompt = getSpeedPrompt(actionDesc, i, maxIteration, fileDesc, systemInstructions);
       break;
   }
 

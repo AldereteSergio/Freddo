@@ -63,6 +63,7 @@ class Researcher {
         i,
         maxIteration,
         input.config.fileIds,
+        input.config.systemInstructions,
       );
 
       const actionStream = input.config.llm.streamText({
