@@ -241,7 +241,8 @@ class ConfigManager {
     this.uiConfigSections.search.forEach((f) => {
       if (f.env) {
         const envVal = process.env[f.env];
-        if (envVal !== undefined) {
+        // Only override if the environment variable is explicitly set and not empty
+        if (envVal) {
           this.currentConfig.search[f.key] = envVal;
         } else if (!this.currentConfig.search[f.key]) {
           this.currentConfig.search[f.key] = f.default ?? '';
