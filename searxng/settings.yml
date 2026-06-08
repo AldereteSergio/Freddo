@@ -1,17 +1,27 @@
+# SearXNG settings
+
 use_default_settings: true
 
 general:
-  instance_name: 'searxng'
+  debug: false
+  instance_name: "SearXNG"
 
 search:
-  autocomplete: 'google'
+  safe_search: 2
+  autocomplete: 'duckduckgo'
   formats:
     - html
     - json
 
 server:
-  secret_key: 'a2fb23f1b02e6ee83875b09826990de0f6bd908b6638e8c10277d415f6ab852b' # Is overwritten by ${SEARXNG_SECRET}
+  # Is overwritten by ${SEARXNG_SECRET}
+  secret_key: "ultrasecretkey"
+  limiter: false
+  image_proxy: true
+  # public URL of the instance, to ensure correct inbound links. Is overwritten
+  # by ${SEARXNG_BASE_URL}.
+  # base_url: http://example.com/location
 
-engines:
-  - name: wolframalpha
-    disabled: false
+valkey:
+  # URL to connect valkey database. Is overwritten by ${SEARXNG_VALKEY_URL}.
+  url: valkey://valkey:6379/0
