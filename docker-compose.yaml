@@ -11,6 +11,7 @@ services:
     environment:
       - SEARXNG_API_URL=http://host.docker.internal:5656
       - CHROME_URL=ws://browser:3000
+      - OLLAMA_BASE_URL=http://host.docker.internal:11434
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:
