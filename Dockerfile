@@ -37,6 +37,6 @@ RUN mkdir /home/zayka/uploads && chmod +x ./entrypoint.sh && sed -i 's/\r$//' ./
 EXPOSE 3000
 
 # Default environment for SearXNG (User has it on 5656)
-ENV SEARXNG_API_URL=http://host.docker.internal:5656
+ENV SEARXNG_API_URL=http://searxng:8080
 
 CMD ["/home/zayka/entrypoint.sh"]

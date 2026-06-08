@@ -188,10 +188,15 @@ class SearchAgent {
         )
         .execute();
     } catch (error: any) {
+      const message =
+        error.message?.includes('429')
+          ? 'El proveedor de IA rechazó la solicitud (429: límite de cuota). Probá con Ollama u otro modelo.'
+          : error.message || 'An error occurred during the search process.';
+
       console.error(`Error in SearchAgent: ${error.message}`);
       session.emit('data', {
         type: 'error',
-        data: error.message || 'An error occurred during the search process.',
+        data: message,
       });
       session.emit('end', {});
 

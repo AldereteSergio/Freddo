@@ -1,3 +1,5 @@
+[botdetection]
+
 [botdetection.ip_limit]
-# activate link_token method in the ip_limit method
-link_token = true
+# Instancia privada en Docker: no exigir link_token ni headers de proxy.
+link_token = false
