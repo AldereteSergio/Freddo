@@ -38,7 +38,7 @@ services:
     volumes:
       - ./searxng:/etc/searxng:Z
     environment:
-      - SEARXNG_SECRET=${SEARXNG_SECRET}
+      - SEARXNG_SECRET=${SEARXNG_SECRET:-306e987c89fca6e828469de2a3a5e8f470d06a86e92bca1e9cb1906f30d065df}
       - SEARXNG_VALKEY_URL=valkey://valkey:6379/0
     depends_on:
       - valkey
