@@ -25,3 +25,7 @@ server:
 valkey:
   # URL to connect valkey database. Is overwritten by ${SEARXNG_VALKEY_URL}.
   url: valkey://valkey:6379/0
+
+engines:
+  - name: wolframalpha
+    disabled: false
